@@ -9,10 +9,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.freakstars.locationfinder.app.Config;
+import com.freakstars.locationfinder.app.MyApplication;
 import com.freakstars.locationfinder.gcm.GcmIntentService;
+import com.freakstars.locationfinder.gcm.NotificationUtils;
+import com.freakstars.locationfinder.model.Message;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -28,7 +33,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (MyApplication.getInstance().getPrefManager().getUser() == null) {
+            launchLoginActivity();
+        }
         setContentView(R.layout.activity_main);
+        Button logout=(Button)findViewById(R.id.logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                MyApplication.getInstance().logout();
+            }
+        });
+        Button sendmessage=(Button)findViewById(R.id.sendmessage);
+        sendmessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in=new Intent(getApplicationContext(),SendMessage.class);
+                startActivity(in);
+            }
+        });
 
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
@@ -42,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     String token = intent.getStringExtra("token");
 
                     Toast.makeText(getApplicationContext(), "GCM registration token: " + token, Toast.LENGTH_LONG).show();
+                    subscribeToGlobalTopic();
 
                 } else if (intent.getAction().equals(Config.SENT_TOKEN_TO_SERVER)) {
                     // gcm registration id is stored in our server's MySQL
@@ -52,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     // new push notification is received
 
                     Toast.makeText(getApplicationContext(), "Push notification is received!", Toast.LENGTH_LONG).show();
+                    handlePushNotification(intent);
                 }
             }
         };
@@ -60,11 +86,31 @@ public class MainActivity extends AppCompatActivity {
             registerGCM();
         }
     }
+    private void handlePushNotification(Intent intent) {
+        int type = intent.getIntExtra("type", -1);
+
+        // if the push is of chat room message
+        // simply update the UI unread messages count
+         if (type == Config.PUSH_TYPE_USER) {
+            // push belongs to user alone
+            // just showing the message in a toast
+            Message message = (Message) intent.getSerializableExtra("message");
+            Toast.makeText(getApplicationContext(), "New push: " + message.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+
+    }
 
     // starting the service to register with GCM
     private void registerGCM() {
         Intent intent = new Intent(this, GcmIntentService.class);
         intent.putExtra("key", "register");
+        startService(intent);
+    }
+    private void subscribeToGlobalTopic() {
+        Intent intent = new Intent(this, GcmIntentService.class);
+        intent.putExtra(GcmIntentService.KEY, GcmIntentService.SUBSCRIBE);
+        intent.putExtra(GcmIntentService.TOPIC, Config.TOPIC_GLOBAL);
         startService(intent);
     }
 
@@ -97,8 +143,14 @@ public class MainActivity extends AppCompatActivity {
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+       NotificationUtils.clearNotifications();
     }
-
+    private void launchLoginActivity() {
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
