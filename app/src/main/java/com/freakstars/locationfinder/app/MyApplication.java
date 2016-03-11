@@ -7,6 +7,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.freakstars.locationfinder.activity.Activity_Login;
 import com.freakstars.locationfinder.activity.LoginActivity;
 import com.freakstars.locationfinder.helper.MyPreferenceManager;
 import com.android.volley.Request;
@@ -65,6 +66,13 @@ public class MyApplication extends Application {
     public void logout() {
         pref.clear();
         Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+    public void logoutfromapp()
+    {
+        pref.clear();
+        Intent intent = new Intent(this, Activity_Login.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }

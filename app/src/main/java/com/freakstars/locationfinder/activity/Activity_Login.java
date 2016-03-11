@@ -1,10 +1,9 @@
 package com.freakstars.locationfinder.activity;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,6 +19,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.freakstars.locationfinder.R;
+import com.freakstars.locationfinder.app.EndPoints;
+import com.freakstars.locationfinder.app.MyApplication;
+import com.freakstars.locationfinder.model.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,51 +30,28 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.freakstars.locationfinder.R;
-import com.freakstars.locationfinder.app.EndPoints;
-import com.freakstars.locationfinder.app.MyApplication;
-import com.freakstars.locationfinder.model.User;
+public class Activity_Login extends AppCompatActivity {
 
-public class LoginActivity extends AppCompatActivity {
-
-    private String TAG = LoginActivity.class.getSimpleName();
-    private EditText inputName, inputEmail;
-    private TextInputLayout inputLayoutName, inputLayoutEmail;
+    private String TAG = Activity_Login.class.getSimpleName();
+    private EditText inputPassword, inputEmail;
+    private TextInputLayout inputLayoutPassword, inputLayoutEmail;
     private Button btnEnter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /**
-         * Check for login session. It user is already logged in
-         * redirect him to main activity
-         * */
         if (MyApplication.getInstance().getPrefManager().getUser() != null) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this,Activity_Main.class));
             finish();
         }
-
-        setContentView(R.layout.activity_login);
-
-
-        inputLayoutName = (TextInputLayout) findViewById(R.id.input_layout_name);
+        setContentView(R.layout.activity_activity__login);
+        inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
         inputLayoutEmail = (TextInputLayout) findViewById(R.id.input_layout_email);
-        inputName = (EditText) findViewById(R.id.input_name);
+        inputPassword = (EditText) findViewById(R.id.input_password);
         inputEmail = (EditText) findViewById(R.id.input_email);
         btnEnter = (Button) findViewById(R.id.btn_enter);
 
-        inputName.addTextChangedListener(new MyTextWatcher(inputName));
+        inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
-        Button button=(Button)findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Intent in = new Intent(getApplicationContext(),Activity_Login.class);
-                startActivity(in);
-            }
-        });
 
         btnEnter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,14 +59,17 @@ public class LoginActivity extends AppCompatActivity {
                 login();
             }
         });
+        Button signup=(Button)findViewById(R.id.signup);
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in=new Intent(getApplicationContext(),Signup.class);
+                startActivity(in);
+            }
+        });
     }
-
-    /**
-     * logging in user. Will make http post request with name, email
-     * as parameters
-     */
     private void login() {
-        if (!validateName()) {
+        if (!validatePassword()) {
             return;
         }
 
@@ -94,11 +77,11 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        final String name = inputName.getText().toString();
+        final String password = inputPassword.getText().toString();
         final String email = inputEmail.getText().toString();
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                EndPoints.LOGIN, new Response.Listener<String>() {
+                EndPoints.APP_LOGIN, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -108,19 +91,20 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject obj = new JSONObject(response);
 
                     // check for error flag
-                    if (obj.getBoolean("error") == false) {
+
+                    if (obj.getString("error").compareTo("false")==0) {
                         // user successfully logged in
 
-                        JSONObject userObj = obj.getJSONObject("user");
-                        User user = new User(userObj.getString("user_id"),
-                                userObj.getString("name"),
-                                userObj.getString("email"));
+                        //JSONObject userObj = obj.getJSONObject("user");
+                       User user = new User(obj.getString("user_id"),
+                                obj.getString("name"),
+                                obj.getString("email"));
 
                         // storing user in shared preferences
                         MyApplication.getInstance().getPrefManager().storeUser(user);
 
                         // start main activity
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), Activity_Main.class));
                         finish();
 
                     } else {
@@ -146,8 +130,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", name);
+
                 params.put("email", email);
+                params.put("password", password);
 
                 Log.e(TAG, "params: " + params.toString());
                 return params;
@@ -165,13 +150,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // Validating name
-    private boolean validateName() {
-        if (inputName.getText().toString().trim().isEmpty()) {
-            inputLayoutName.setError(getString(R.string.err_msg_name));
-            requestFocus(inputName);
+    private boolean validatePassword() {
+        if (inputPassword.getText().toString().trim().isEmpty()) {
+            inputLayoutPassword.setError(getString(R.string.err_msg_name));
+            requestFocus(inputPassword);
             return false;
         } else {
-            inputLayoutName.setErrorEnabled(false);
+            inputLayoutPassword.setErrorEnabled(false);
         }
 
         return true;
@@ -211,8 +196,8 @@ public class LoginActivity extends AppCompatActivity {
 
         public void afterTextChanged(Editable editable) {
             switch (view.getId()) {
-                case R.id.input_name:
-                    validateName();
+                case R.id.input_password:
+                    validatePassword();
                     break;
                 case R.id.input_email:
                     validateEmail();

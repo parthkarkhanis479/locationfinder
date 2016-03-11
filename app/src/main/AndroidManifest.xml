@@ -62,7 +62,10 @@
         </service>
         <!-- END Added for GCM -->
         <activity android:name=".activity.LoginActivity" />
-        <activity android:name=".activity.SendMessage"></activity>
+        <activity android:name=".activity.SendMessage" />
+        <activity android:name=".activity.Activity_Login" />
+        <activity android:name=".activity.Activity_Main" />
+        <activity android:name=".activity.Signup"></activity>
     </application>
 
 </manifest>
