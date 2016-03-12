@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -36,6 +37,7 @@ public class Activity_Login extends AppCompatActivity {
     private EditText inputPassword, inputEmail;
     private TextInputLayout inputLayoutPassword, inputLayoutEmail;
     private Button btnEnter;
+    private Toolbar mToolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +46,10 @@ public class Activity_Login extends AppCompatActivity {
             finish();
         }
         setContentView(R.layout.activity_activity__login);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
         inputLayoutEmail = (TextInputLayout) findViewById(R.id.input_layout_email);
         inputPassword = (EditText) findViewById(R.id.input_password);

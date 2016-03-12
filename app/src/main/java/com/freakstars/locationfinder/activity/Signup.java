@@ -3,6 +3,7 @@ package com.freakstars.locationfinder.activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,10 +29,15 @@ import java.util.Map;
 public class Signup extends AppCompatActivity {
     private String TAG = Signup.class.getSimpleName();
     private EditText inputName,inputPassword,inputEmail,inputPhoneNo;
+    private Toolbar mToolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         inputName=(EditText)findViewById(R.id.input_name);
         inputEmail=(EditText)findViewById(R.id.input_email);
         inputPhoneNo=(EditText)findViewById(R.id.input_phoneno);
