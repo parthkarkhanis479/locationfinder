@@ -143,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
         // by doing this, the activity will be notified each time a new message arrives
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(Config.PUSH_NOTIFICATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.SENT_TOKEN_TO_SERVER));
        NotificationUtils.clearNotifications();
     }
     private void launchLoginActivity() {
