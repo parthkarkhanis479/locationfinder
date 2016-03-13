@@ -14,6 +14,7 @@ public class EndPoints {
     public static final String APP_BASE_URL="http://friendlocator.esy.es/friendlocator/v1";
     public static final String APP_LOGIN=APP_BASE_URL +"/login";
     public static final String SIGNUP=APP_BASE_URL+"/register";
+    public static final String LOGOUT=APP_BASE_URL+"/logout";
 
 }
 

@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,16 +16,30 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.freakstars.locationfinder.R;
+import com.freakstars.locationfinder.app.EndPoints;
 import com.freakstars.locationfinder.app.MyApplication;
 import com.freakstars.locationfinder.fragment.FragmentDrawer;
 import com.freakstars.locationfinder.fragment.FriendsFragment;
 import com.freakstars.locationfinder.fragment.HomeFragment;
 import com.freakstars.locationfinder.helper.MyPreferenceManager;
+import com.freakstars.locationfinder.model.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Activity_Main extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
+    private String TAG=Activity_Main.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,11 +104,67 @@ public class Activity_Main extends AppCompatActivity implements FragmentDrawer.F
         inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
+    public void logout()
+    {
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                EndPoints.LOGOUT, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                Log.e(TAG, "response: " + response);
+
+                try {
+                    JSONObject obj = new JSONObject(response);
+
+                    // check for error flag
+
+                    if (obj.getString("error").compareTo("false")==0) {
+
+                       Toast.makeText(getApplicationContext(),"You have logout successfully",Toast.LENGTH_SHORT).show();
+                        MyApplication.getInstance().logoutfromapp();
+
+                    } else {
+                        // login error - simply toast the message
+                        Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+                    }
+
+                } catch (JSONException e) {
+                    Log.e(TAG, "json parsing error: " + e.getMessage());
+                    Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
+                Toast.makeText(getApplicationContext(), "Volley error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+
+                params.put("user_id",MyApplication.getInstance().getPrefManager().getUser().getId());
+
+
+                Log.e(TAG, "params: " + params.toString());
+                return params;
+            }
+        };
+
+        //Adding request to request queue
+        MyApplication.getInstance().addToRequestQueue(strReq);
+    }
+
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.action_logout:
-                MyApplication.getInstance().logoutfromapp();
+                logout();
+               // MyApplication.getInstance().logoutfromapp();
                 break;
         }
         return super.onOptionsItemSelected(menuItem);
