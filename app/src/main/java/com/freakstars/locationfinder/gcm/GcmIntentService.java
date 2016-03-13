@@ -109,7 +109,7 @@ public class GcmIntentService extends IntentService {
             return;
         }
 
-        String endPoint = EndPoints.USER.replace("_ID_", user.getId());
+        String endPoint = EndPoints.UPDATE_GCM_ID.replace("_ID_", user.getId());
 
         Log.e(TAG, "endpoint: " + endPoint);
 

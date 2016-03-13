@@ -22,13 +22,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.freakstars.locationfinder.R;
+import com.freakstars.locationfinder.app.Config;
 import com.freakstars.locationfinder.app.EndPoints;
 import com.freakstars.locationfinder.app.MyApplication;
 import com.freakstars.locationfinder.fragment.FragmentDrawer;
 import com.freakstars.locationfinder.fragment.FriendsFragment;
 import com.freakstars.locationfinder.fragment.HomeFragment;
+import com.freakstars.locationfinder.gcm.GcmIntentService;
 import com.freakstars.locationfinder.helper.MyPreferenceManager;
 import com.freakstars.locationfinder.model.User;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +44,7 @@ public class Activity_Main extends AppCompatActivity implements FragmentDrawer.F
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
     private String TAG=Activity_Main.class.getSimpleName();
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +61,9 @@ public class Activity_Main extends AppCompatActivity implements FragmentDrawer.F
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         drawerFragment.setDrawerListener(this);
         displayView(0);
+        if (checkPlayServices()) {
+            registerGCM();
+        }
         Toast.makeText(getApplicationContext(),""+MyApplication.getInstance().getPrefManager().getUser().getName(),Toast.LENGTH_SHORT).show();
 
 
@@ -102,6 +110,34 @@ public class Activity_Main extends AppCompatActivity implements FragmentDrawer.F
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+    private void registerGCM() {
+        Intent intent = new Intent(this, GcmIntentService.class);
+        intent.putExtra("key", "register");
+        startService(intent);
+    }
+    public void subscribeToGlobalTopic() {
+        Intent intent = new Intent(this, GcmIntentService.class);
+        intent.putExtra(GcmIntentService.KEY, GcmIntentService.SUBSCRIBE);
+        intent.putExtra(GcmIntentService.TOPIC, Config.TOPIC_GLOBAL);
+        startService(intent);
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported. Google Play Services not installed!");
+                Toast.makeText(getApplicationContext(), "This device is not supported. Google Play Services not installed!", Toast.LENGTH_LONG).show();
+                finish();
+            }
+            return false;
+        }
         return true;
     }
     public void logout()
