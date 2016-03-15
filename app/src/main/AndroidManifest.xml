@@ -3,6 +3,7 @@
     package="com.freakstars.locationfinder">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!--
      needed for older devices -
