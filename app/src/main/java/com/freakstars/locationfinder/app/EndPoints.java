@@ -16,6 +16,8 @@ public class EndPoints {
     public static final String SIGNUP=APP_BASE_URL+"/register";
     public static final String LOGOUT=APP_BASE_URL+"/logout";
     public static final String UPDATE_GCM_ID=APP_BASE_URL+"/gcm/_ID_";
+    public static final String SEND_FRIEND_REQUEST=APP_BASE_URL+"/sentrequest";
+    public static final String PENDING_FRIEND_REQUESTS=APP_BASE_URL+"/users/request_recived";
 
 }
 

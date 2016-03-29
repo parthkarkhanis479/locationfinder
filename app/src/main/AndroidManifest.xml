@@ -28,13 +28,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/MyMaterialTheme">
-        <activity android:name=".activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".activity.MainActivity"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+
         <!-- START Added for GCM -->
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -65,7 +61,13 @@
         <activity android:name=".activity.LoginActivity" />
         <activity android:name=".activity.SendMessage" />
         <activity android:name=".activity.Activity_Login" />
-        <activity android:name=".activity.Activity_Main" />
+        <activity android:name=".activity.Activity_Main" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
         <activity android:name=".activity.Signup"></activity>
     </application>
 

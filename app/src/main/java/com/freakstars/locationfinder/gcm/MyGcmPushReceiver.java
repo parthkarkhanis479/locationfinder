@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.freakstars.locationfinder.activity.Activity_Main;
 import com.freakstars.locationfinder.activity.MainActivity;
 import com.freakstars.locationfinder.app.Config;
 import com.freakstars.locationfinder.app.MyApplication;
@@ -20,6 +21,9 @@ import com.google.android.gms.gcm.GcmListenerService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MyGcmPushReceiver extends GcmListenerService {
     private static final String TAG = MyGcmPushReceiver.class.getSimpleName();
@@ -68,11 +72,61 @@ public class MyGcmPushReceiver extends GcmListenerService {
                 break;
             case Config.PUSH_TYPE_USER:
                 // push notification is specific to user
-                processUserMessage(title, isBackground, data);
+                //processUserMessage(title, isBackground, data);
+                receiveFriendRequest(title,isBackground,data);
                 break;
         }
     }
+    private void receiveFriendRequest(String title, boolean isBackground, String data) {
+        if (!isBackground) {
 
+            try {
+                JSONObject datObj = new JSONObject(data);
+
+
+
+                JSONObject mObj = datObj.getJSONObject("user");
+                User user = new User();
+                user.setId(mObj.getString("user_id"));
+                user.setEmail(mObj.getString("email"));
+                user.setName(mObj.getString("name"));
+                String name=mObj.getString("name");
+
+
+
+
+                // verifying whether the app is in background or foreground
+                if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
+
+                    // app is in foreground, broadcast the push message
+                    Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
+                    pushNotification.putExtra("type", Config.PUSH_TYPE_USER);
+                    pushNotification.putExtra("message",user);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+
+                    // play notification sound
+                    NotificationUtils notificationUtils = new NotificationUtils();
+                    notificationUtils.playNotificationSound();
+                } else {
+
+                    // app is in background. show the message in notification try
+                    Intent resultIntent = new Intent(getApplicationContext(), Activity_Main.class);
+
+                    // check for push notification image attachment
+
+                        showNotificationMessage(getApplicationContext(), title,user.getName()+"has sent u friend request",getCurrentTimeStamp(), resultIntent);
+
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "json parsing error: " + e.getMessage());
+                Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        } else {
+            // the push notification is silent, may be other operations needed
+            // like inserting it in to SQLite
+        }
+    }
     /**
      * Processing chat room push message
      * this message will be broadcasts to all the activities registered
@@ -217,5 +271,18 @@ public class MyGcmPushReceiver extends GcmListenerService {
         notificationUtils = new NotificationUtils(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         notificationUtils.showNotificationMessage(title, message, timeStamp, intent, imageUrl);
+    }
+    public static String getCurrentTimeStamp(){
+        try {
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentTimeStamp = dateFormat.format(new Date()); // Find todays date
+
+            return currentTimeStamp;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        }
     }
 }

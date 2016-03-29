@@ -10,6 +10,41 @@
         android:layout_height="wrap_content"
         android:text="ADD FRIENDS"
         android:id="@+id/contact_pick"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/contact_details"
+        android:layout_below="@+id/contact_pick">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/_14sdp"
+            android:id="@+id/contact_name"
+            android:text="hello"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/_14sdp"
+            android:id="@+id/contact_no"
+            android:text="hello"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="@dimen/_14sdp"
+            android:id="@+id/contact_email"
+            android:text="hello"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/sendrequest"
+            android:text="Send Friend Request"/>
+    </LinearLayout>
 </RelativeLayout>

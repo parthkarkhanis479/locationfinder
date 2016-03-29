@@ -13,12 +13,15 @@
     <string name="drawer_close">Close</string>
     <string name="nav_item_home">Home</string>
     <string name="nav_item_friends">Friends</string>
+    <string name="nav_pending_requests">Pending Requests</string>
     <string-array name="nav_drawer_labels">
         <item>@string/nav_item_home</item>
         <item>@string/nav_item_friends</item>
+        <item>@string/nav_pending_requests</item>
     </string-array>
     <string name="title_friends">Friends</string>
     <string name="title_home">Home</string>
+    <string name="title_pending_requests">Pending Requests</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

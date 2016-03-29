@@ -28,6 +28,7 @@ import com.freakstars.locationfinder.app.MyApplication;
 import com.freakstars.locationfinder.fragment.FragmentDrawer;
 import com.freakstars.locationfinder.fragment.FriendsFragment;
 import com.freakstars.locationfinder.fragment.HomeFragment;
+import com.freakstars.locationfinder.fragment.Pending_Requests;
 import com.freakstars.locationfinder.gcm.GcmIntentService;
 import com.freakstars.locationfinder.helper.MyPreferenceManager;
 import com.freakstars.locationfinder.model.User;
@@ -64,7 +65,7 @@ public class Activity_Main extends AppCompatActivity implements FragmentDrawer.F
         if (checkPlayServices()) {
             registerGCM();
         }
-        Toast.makeText(getApplicationContext(),""+MyApplication.getInstance().getPrefManager().getUser().getName(),Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getApplicationContext(),""+MyApplication.getInstance().getPrefManager().getUser().getName(),Toast.LENGTH_SHORT).show();
 
 
     }
@@ -89,6 +90,10 @@ public class Activity_Main extends AppCompatActivity implements FragmentDrawer.F
             case 1:
                 fragment = new FriendsFragment();
                 title = getString(R.string.title_friends);
+                break;
+            case 2:
+                fragment=new Pending_Requests();
+                title=getString(R.string.title_pending_requests);
                 break;
 
             default:
